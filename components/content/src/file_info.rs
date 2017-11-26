@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 /// Takes a full path to a file and returns only the components after the first `content` directory
 /// Will not return the filename as last component
+/// eg. content/file/name/sg.md -> [file, name]
 pub fn find_content_components<P: AsRef<Path>>(path: P) -> Vec<String> {
     let path = path.as_ref();
     let mut is_in_content = false;
@@ -31,6 +32,7 @@ pub struct FileInfo {
     /// The name of the .md file without the extension, always `_index` for sections
     pub name: String,
     /// The .md path, starting from the content directory, with `/` slashes
+    /// eg. content/kb/solutions/blabla.md -> kb/solutions/blabla.md
     pub relative: String,
     /// Path of the directory containing the .md file
     pub parent: PathBuf,

@@ -29,7 +29,7 @@ impl Theme {
         if let Some(theme_table) = theme.as_table() {
             if let Some(ex) = theme_table.get("extra") {
                 if ex.is_table() {
-                    extra = ex.clone().try_into().unwrap();
+                    extra = ex.clone().try_into().unwrap(); // convert to HashMap
                 }
             }
         } else {

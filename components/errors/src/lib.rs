@@ -24,7 +24,7 @@ macro_rules! bail {
     ($e:expr) => {
         return Err($e.into());
     };
-    ($fmt:expr, $($arg:tt)+) => {
+    ($fmt:expr, $($arg:tt)+) => { // :note, $($arg:tt)+, $arg:tt match param, $()+, match multiple param
         return Err(format!($fmt, $($arg)+).into());
     };
 }

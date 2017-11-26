@@ -17,7 +17,7 @@ fn read_line() -> Result<String> {
 
 /// Ask a yes/no question to the user
 pub fn ask_bool(question: &str, default: bool) -> Result<bool> {
-    print!("{} {}: ", question, if default { "[Y/n]" } else { "[y/N]" });
+    print!("{} {}: ", question, if default { "[Y/n]" } else { "[y/N]" }); //:note, default options in cli
     let _ = io::stdout().flush();
     let input = read_line()?;
 

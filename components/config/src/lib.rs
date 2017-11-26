@@ -107,7 +107,7 @@ impl Config {
     }
 
     /// Makes a url, taking into account that the base url might have a trailing slash
-    pub fn make_permalink(&self, path: &str) -> String {
+    pub fn make_permalink(&self, path: &str) -> String { // join self.base_path with path
         let trailing_bit = if path.ends_with('/') || path.is_empty() { "" } else { "/" };
 
         // Index section with a base url that has a trailing slash
@@ -137,7 +137,7 @@ impl Config {
             }
 
             // 3. overwrite with original config
-            for (key, val) in &original {
+            for (key, val) in &original { // :note, this should not be necessary
                 config_extra.entry(key.to_string()).or_insert_with(|| val.clone());
             }
         }
@@ -166,7 +166,7 @@ impl Default for Config {
             description: None,
             language_code: Some("en".to_string()),
             generate_rss: Some(false),
-            rss_limit: Some(10_000),
+            rss_limit: Some(10_000),        // :note,
             generate_tags_pages: Some(true),
             generate_categories_pages: Some(true),
             compile_sass: Some(false),
@@ -274,7 +274,7 @@ hello = "world"
 
     #[test]
     fn can_merge_with_theme_data_and_preserve_config_value() {
-        let config_str = r#"
+        let config_str = r#"                        //:note, raw string literials, https://doc.rust-lang.org/reference/tokens.html#raw-string-literals
 title = "My site"
 base_url = "https://replace-this-with-your-url.com"
 

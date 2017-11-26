@@ -107,7 +107,7 @@ pub fn after_content_change(site: &mut Site, path: &Path) -> Result<()> {
             // A section was deleted, many things can be impacted:
             // - the pages of the section are becoming orphans
             // - any page that was referencing the section (index, etc)
-            let relative_path = site.sections[path].file.relative.clone();
+            let relative_path = site.sections[path].file.relative.clone(); // :todo, syntax sections[path]
             // Remove the link to it and the section itself from the Site
             site.permalinks.remove(&relative_path);
             site.sections.remove(path);
