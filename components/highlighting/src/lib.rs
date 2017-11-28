@@ -6,8 +6,11 @@ use syntect::dumps::from_binary;
 use syntect::parsing::SyntaxSet;
 use syntect::highlighting::ThemeSet;
 
-thread_local!{
+// :note, thread local variables
+// for more info, see: https://doc.rust-lang.org/std/thread/struct.LocalKey.html
+thread_local!{              
     pub static SYNTAX_SET: SyntaxSet = {
+        // :note, std::include_bytes
         let mut ss: SyntaxSet = from_binary(include_bytes!("../../../sublime_syntaxes/newlines.packdump"));
         ss.link_syntaxes();
         ss

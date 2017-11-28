@@ -13,7 +13,7 @@ pub fn sort_pages(pages: Vec<Page>, sort_by: SortBy) -> (Vec<Page>, Vec<Page>) {
     }
 
     let (mut can_be_sorted, cannot_be_sorted): (Vec<_>, Vec<_>) = pages
-        .into_par_iter()
+        .into_par_iter()    // rayon methods, parallelism iter
         .partition(|page| {
             match sort_by {
                 SortBy::Date => page.meta.date.is_some(),
@@ -35,6 +35,7 @@ pub fn sort_pages(pages: Vec<Page>, sort_by: SortBy) -> (Vec<Page>, Vec<Page>) {
 
 /// Horribly inefficient way to set previous and next on each pages that skips drafts
 /// So many clones
+/// this function create an entirely new Vec<Page> out of &[Page]
 pub fn populate_previous_and_next_pages(input: &[Page]) -> Vec<Page> {
     let mut res = Vec::with_capacity(input.len());
 
@@ -49,14 +50,14 @@ pub fn populate_previous_and_next_pages(input: &[Page]) -> Vec<Page> {
 
         if i > 0 {
             let mut j = i;
-            loop {
+            loop {          // find everything before i
                 if j == 0 {
                     break;
                 }
 
                 j -= 1;
 
-                if input[j].is_draft() {
+                if input[j].is_draft() { // skip draft
                     continue;
                 }
 
@@ -136,7 +137,7 @@ mod tests {
         ];
         let (pages, _) = sort_pages(input, SortBy::Date);
         // Should be sorted by date
-        assert_eq!(pages[0].clone().meta.date.unwrap(), "2019-01-01");
+        assert_eq!(pages[0].clone().meta.date.unwrap(), "2019-01-01"); // :note, clone() avoid unable to move elments out of index
         assert_eq!(pages[1].clone().meta.date.unwrap(), "2018-01-01");
         assert_eq!(pages[2].clone().meta.date.unwrap(), "2017-01-01");
     }
@@ -204,7 +205,7 @@ mod tests {
         ];
         let pages = populate_previous_and_next_pages(&input);
 
-        assert!(pages[0].clone().next.is_none());
+        assert!(pages[0].clone().next.is_none());           // :note, due to the implementation, here it's acutally a recursive clone invocation on page data.
         assert!(pages[0].clone().previous.is_some());
         assert_eq!(pages[0].clone().previous.unwrap().meta.order.unwrap(), 2);
 

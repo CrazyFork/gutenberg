@@ -26,7 +26,7 @@ pub struct SectionFrontMatter {
     pub weight: Option<usize>,
     /// Optional template, if we want to specify which template to render for that section
     #[serde(skip_serializing)]
-    pub template: Option<String>,
+    pub template: Option<String>, //:todo, meaning?
     /// How many pages to be displayed per paginated page. No pagination will happen if this isn't set
     #[serde(skip_serializing)]
     pub paginate_by: Option<usize>,

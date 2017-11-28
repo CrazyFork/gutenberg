@@ -8,6 +8,7 @@ use config::Config;
 use utils::site::resolve_internal_link;
 
 
+// file Page in all_pages by path that passed by variable args
 pub fn make_get_page(all_pages: &HashMap<PathBuf, Page>) -> GlobalFn {
     let mut pages = HashMap::new();
     for page in all_pages.values() {
@@ -30,6 +31,8 @@ pub fn make_get_page(all_pages: &HashMap<PathBuf, Page>) -> GlobalFn {
     })
 }
 
+
+// file Section in all_sections by path that passed by variable args
 pub fn make_get_section(all_sections: &HashMap<PathBuf, Section>) -> GlobalFn {
     let mut sections = HashMap::new();
     for section in all_sections.values() {

@@ -1,3 +1,6 @@
 * livereloadjs
 ci scripts
 error chain, still cant figure it out, need to view its source code it seems
+
+serde, serde_derive
+tera

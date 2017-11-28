@@ -6,12 +6,15 @@ use tera::{Value, to_value, Result as TeraResult};
 
 
 pub fn markdown(value: Value, _: HashMap<String, Value>) -> TeraResult<Value> {
+    // :note, tera::try_get_value
+    // http://clux.github.io/blog/tera/macro.try_get_value.html
     let s = try_get_value!("markdown", "value", String, value);
 
     let mut html = String::new();
     let parser = cmark::Parser::new(&s);
     cmark::html::push_html(&mut html, parser);
 
+    // :note,  tera::to_value, convert any value to serde_json::Value
     Ok(to_value(&html).unwrap())
 }
 
