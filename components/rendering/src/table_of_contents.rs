@@ -59,6 +59,7 @@ impl TempHeader {
             String::new()
         };
 
+        // 控制 header 的样式, #hash链接插入在title 左面, 右面, or none.
         match context.insert_anchor {
             InsertAnchor::None => format!("<h{lvl} id=\"{id}\">{t}</h{lvl}>\n", lvl=self.level, t=self.title, id=self.id),
             InsertAnchor::Left => format!("<h{lvl} id=\"{id}\">{a}{t}</h{lvl}>\n", lvl=self.level, a=anchor_link, t=self.title, id=self.id),

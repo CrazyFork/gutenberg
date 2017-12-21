@@ -76,7 +76,7 @@ impl Section {
     }
 
     /// Read and parse a .md file into a Page struct
-    pub fn from_file<P: AsRef<Path>>(path: P, config: &Config) -> Result<Section> {
+    pub fn from_file<P: AsRef<Path>>(path: P, config: &Config) -> Result<Section> { // Result<Section> ?
         let path = path.as_ref();
         let content = read_file(path)?;
 

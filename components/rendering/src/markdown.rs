@@ -13,7 +13,7 @@ use highlighting::{SYNTAX_SET, THEME_SET};
 use short_code::{SHORTCODE_RE, ShortCode, parse_shortcode, render_simple_shortcode};
 use table_of_contents::{TempHeader, Header, make_table_of_contents};
 
-
+// convert markdown content to html, and parse out all markdown headers, organize it, then return both of them.
 pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec<Header>)> {
     // We try to be smart about highlighting code as it can be time-consuming
     // If the global config disables it, then we do nothing. However,
@@ -79,9 +79,9 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
     {
 
         let parser = Parser::new_ext(content, opts).map(|event| {
-            if clear_shortcode_block {
+            if clear_shortcode_block {              // only set this to true when reaching end of shortcode
                 clear_shortcode_block = false;
-                shortcode_block = None;
+                shortcode_block = None;             // current shortcode_block info, name with args.
             }
 
             match event {
@@ -90,9 +90,9 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
                 if in_header {
                     if header_created {
                         temp_header.push(&text);
-                        return Event::Html(Owned(String::new()));
+                        return Event::Html(Owned(String::new()));   // replace this content to emtpy string 
                     }
-                    let id = find_anchor(&anchors, slugify(&text), 0);
+                    let id = find_anchor(&anchors, slugify(&text), 0); //todo: failed to make sense what it does
                     anchors.push(id.clone());
                     // update the header and add it to the list
                     temp_header.id = id.clone();
@@ -116,6 +116,7 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
 
                 // Are we in the middle of a shortcode that somehow got cut off
                 // by the markdown parser?
+                // start:shortcode 被截断的情况
                 if current_shortcode.is_empty() {
                     if text.starts_with("{{") && !text.ends_with("}}") {
                         current_shortcode += &text;
@@ -130,8 +131,10 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
                     text = Owned(current_shortcode.clone());
                     current_shortcode = String::new();
                 }
+                // end:shortcode 被截断的情况
 
                 // Shortcode without body
+                // shortcode 有 body 和 没有 body 两种情况, 这种情况是处理没有body的shortcode渲染
                 if shortcode_block.is_none() && text.starts_with("{{") && text.ends_with("}}") && SHORTCODE_RE.is_match(&text) {
                     let (name, args) = parse_shortcode(&text);
 
@@ -160,20 +163,21 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
 
                 // If we have some text while in a shortcode, it's either the body
                 // or the end tag
+                // 这部分是 shortcode 嵌套的有内容， 有点像react jsx中的children, 这个位置需要解析嵌套内容，然后put到shortcode的body中
                 if shortcode_block.is_some() {
                     if let Some(ref mut shortcode) = shortcode_block {
                         if text.trim() == "{% end %}" {
                             added_shortcode = true;
                             clear_shortcode_block = true;
                             match shortcode.render(context.tera) {
-                                Ok(s) => return Event::Html(Owned(format!("</p>{}", s))),
+                                Ok(s) => return Event::Html(Owned(format!("</p>{}", s))), // only return shortcode here
                                 Err(e) => {
                                     error = Some(e);
                                     return Event::Html(Owned(String::new()));
                                 }
                             }
                         } else {
-                            shortcode.append(&text);
+                            shortcode.append(&text);    // append nested content to shortcode
                             return Event::Html(Owned(String::new()));
                         }
                     }
@@ -183,12 +187,12 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
                 Event::Text(text)
             },
             Event::Start(Tag::CodeBlock(ref info)) => {
-                in_code_block = true;
+                in_code_block = true;   // flag, whether in middle of shortcode 
                 if !should_highlight {
                     return Event::Html(Owned("<pre><code>".to_owned()));
                 }
                 let theme = &THEME_SET.themes[&context.highlight_theme];
-                highlighter = SYNTAX_SET.with(|ss| {
+                highlighter = SYNTAX_SET.with(|ss| {  // set highlighter to color code
                     let syntax = info
                         .split(' ')
                         .next()
@@ -228,7 +232,7 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
                 Event::Start(Tag::Link(link.clone(), title.clone()))
             },
             Event::End(Tag::Link(_, _)) => {
-                if in_header {
+                if in_header {  // in markdown header
                     return Event::Html(Owned("".to_owned()));
                 }
                 event
@@ -237,15 +241,15 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
             Event::Start(Tag::Code) => {
                 in_code_block = true;
                 if in_header {
-                    temp_header.push("<code>");
-                    return Event::Html(Owned(String::new()));
+                    temp_header.push("<code>"); // push `code` end tag to header title
+                    return Event::Html(Owned(String::new())); // replace Tag::Code with empty string
                 }
                 event
             },
             Event::End(Tag::Code) => {
                 in_code_block = false;
                 if in_header {
-                    temp_header.push("</code>");
+                    temp_header.push("</code>");    // push `code` end tag to header title
                     return Event::Html(Owned(String::new()));
                 }
                 event
@@ -262,7 +266,7 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
                 let val = temp_header.to_string(context);
                 headers.push(temp_header.clone());
                 temp_header = TempHeader::default();
-                Event::Html(Owned(val))
+                Event::Html(Owned(val))                         // notice the variant type of COW::Owned.
             },
             // If we added shortcodes, don't close a paragraph since there's none
             Event::End(Tag::Paragraph) => {
@@ -285,7 +289,7 @@ pub fn markdown_to_html(content: &str, context: &Context) -> Result<(String, Vec
              },
             }});
 
-        cmark::html::push_html(&mut html, parser);
+        cmark::html::push_html(&mut html, parser);  // push parser to cmark instance
     }
 
     if !current_shortcode.is_empty() {

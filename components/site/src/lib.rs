@@ -163,11 +163,13 @@ impl Site {
         let base_path = self.base_path.to_string_lossy().replace("\\", "/");
         let content_glob = format!("{}/{}", base_path, "content/**/*.md");
 
+        // :todo, section & page are separated by _index.md?
         let (section_entries, page_entries): (Vec<_>, Vec<_>) = glob(&content_glob)
             .unwrap()
             .filter_map(|e| e.ok())
             .partition(|entry| entry.as_path().file_name().unwrap() == "_index.md");
 
+        // filter out path == _index.md
         let sections = {
             let config = &self.config;
 
@@ -181,6 +183,7 @@ impl Site {
                 .collect::<Vec<_>>()
         };
 
+        // filter out pages not equal to _index.md
         let pages = {
             let config = &self.config;
 
@@ -231,7 +234,7 @@ impl Site {
                     let insert_anchor = pages_insert_anchors[&page.file.path];
                     page.render_markdown(permalinks, tera, config, insert_anchor)
                 })
-                .fold(|| Ok(()), Result::and)
+                .fold(|| Ok(()), Result::and)   // :todo,
                 .reduce(|| Ok(()), Result::and)?;
 
             self.sections.par_iter_mut()
@@ -326,6 +329,7 @@ impl Site {
         }
 
         self.sort_sections_pages(None);
+        // todo: ?, clone its pointer, HashMap ref is pointer ?
         // TODO: remove this clone
         let sections = self.sections.clone();
 
@@ -350,7 +354,7 @@ impl Site {
                     continue;
                 }
             }
-            let pages = mem::replace(&mut section.pages, vec![]);
+            let pages = mem::replace(&mut section.pages, vec![]);   // :todo,
             let (sorted_pages, cannot_be_sorted_pages) = sort_pages(pages, section.meta.sort_by());
             section.pages = populate_previous_and_next_pages(&sorted_pages);
             section.ignored_pages = cannot_be_sorted_pages;

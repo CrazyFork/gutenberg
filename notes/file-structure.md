@@ -26,12 +26,12 @@
     │   └── src
     │       ├── file_info.rs                        # FileInfo struct, various info perserved in this struct
     │       ├── lib.rs
-    │       ├── page.rs                             #
-    │       ├── section.rs                          # 
+    │       ├── page.rs                             # parse file from path, can render to html or template
+    │       ├── section.rs                          # parse Section from file path
     │       └── sorting.rs                          # on how to sort pages
     ├── errors                                      # create errors using error-chain, which i haven't quited figure it out how to use it yet
     │   └── src
-    ├── front_matter
+    ├── front_matter                                # .md, _index.md 中的配置信息
     │   └── src                         
     │       ├── lib.rs
     │       ├── page.rs                             # .md file 中的 page info, 在 .md 文件中的 header 定义
@@ -39,25 +39,25 @@
     ├── highlighting                                # provide syntax highlight.
     │   └── src
     │       └── lib.rs                      
-    ├── pagination
+    ├── pagination                                  # Pagination. create pagination for pages
     │   └── src
-    ├── rendering
-    │   ├── benches
-    │   ├── examples
-    │   ├── src
+    ├── rendering                                   # render markdown to html, including highlighting, link resolving...etc
+    │   ├── benches                                 # benchmarks
+    │   ├── examples                                # some example
+    │   ├── src                                     #
+            ├── context.rs                          # all info to render markdown to html
+            ├── lib.rs                              # 
+            ├── markdown.rs                         # core file in this component, main functionality is to parse markdown content, return its html conterpart and headers
+            ├── short_code.rs                       # 用来解析shortcode的语法还有渲染对应 shortcode 模板
+            └── table_of_contents.rs                # Header, TempHeader, 处理 markdown 中的 header, 里边测试用例有用法, 
     │   └── tests
     ├── site
     │   ├── benches
     │   ├── src
-    │   ├── test_site
+    │   ├── test_site                               # example .md files for testing the whole application
     │   │   ├── content
     │   │   │   ├── paginated
     │   │   │   └── posts
-    │   │   │       ├── no-section
-    │   │   │       ├── tutorials
-    │   │   │       │   ├── devops
-    │   │   │       │   └── programming
-    │   │   │       └── with-assets
     │   │   ├── sass
     │   │   ├── static
     │   │   │   └── scripts
@@ -68,8 +68,8 @@
     │   │           ├── sass
     │   │           ├── static
     │   │           └── templates
-    │   └── tests
-    ├── taxonomies
+    │   └── tests                                   # unit tests for src
+    ├── taxonomies                                  # 将 Pages 分类成 tags & categories, 然后进行重组，生成对应页面的链接
     │   └── src
     ├── templates                                   # tera templates 相关的代码, 注册了一些通用的 templates
     │   └── src

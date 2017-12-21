@@ -6,6 +6,8 @@ use tera::{Tera, Context, Value, to_value};
 use errors::{Result, ResultExt};
 
 lazy_static!{
+    // {{ word(a=b c="d") }}
+    // {% word(a=b c="d") %}
     pub static ref SHORTCODE_RE: Regex = Regex::new(r#"\{(?:%|\{)\s+([[:word:]]+?)\(([[:word:]]+?="?.+?"?)?\)\s+(?:%|\})\}"#).unwrap();
 }
 
@@ -14,9 +16,9 @@ lazy_static!{
 /// We need the struct to hold the data while we're processing the markdown
 #[derive(Debug)]
 pub struct ShortCode {
-    name: String,
-    args: HashMap<String, Value>,
-    body: String,
+    name: String,                   // shortcode name
+    args: HashMap<String, Value>,   // shortcode args
+    body: String,                   // body contents
 }
 
 impl ShortCode {
@@ -45,6 +47,10 @@ impl ShortCode {
 }
 
 /// Parse a shortcode without a body
+// 这个函数的作用就是用来解析shortcode的语法, 用正则去解析, 需要注意的是，默认的处理方式会把 key, value 
+// 提取出来, 所以就没有了 value 的类型信息, 然后解析 arg_list 的时候, 会把 value 猜测对应类型去带入到原来的
+// str 中, 试着解析, 解析成功就加入到最终的 HashMap 当中
+// @returns (shortcode_name: String, short_code_args: HashMap<String, Value>)
 pub fn parse_shortcode(input: &str) -> (String, HashMap<String, Value>) {
     let mut args = HashMap::new();
     let caps = SHORTCODE_RE.captures(input).unwrap();

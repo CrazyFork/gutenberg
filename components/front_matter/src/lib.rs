@@ -21,6 +21,7 @@ mod section;
 pub use page::PageFrontMatter;
 pub use section::SectionFrontMatter;
 
+// :todo, (?s)...(?-s) 这种方式应该是正则的flag的开启和关闭
 lazy_static! {
     static ref PAGE_RE: Regex = Regex::new(r"^[[:space:]]*\+\+\+\r?\n((?s).*?(?-s))\+\+\+\r?\n?((?s).*(?-s))$").unwrap();
 }
