@@ -163,7 +163,7 @@ impl Site {
         let base_path = self.base_path.to_string_lossy().replace("\\", "/");
         let content_glob = format!("{}/{}", base_path, "content/**/*.md");
 
-        // :todo, section & page are separated by _index.md?
+        // :todo, section & page are distinguished by _index.md?
         let (section_entries, page_entries): (Vec<_>, Vec<_>) = glob(&content_glob)
             .unwrap()
             .filter_map(|e| e.ok())
@@ -329,7 +329,6 @@ impl Site {
         }
 
         self.sort_sections_pages(None);
-        // todo: ?, clone its pointer, HashMap ref is pointer ?
         // TODO: remove this clone
         let sections = self.sections.clone();
 
@@ -354,7 +353,7 @@ impl Site {
                     continue;
                 }
             }
-            let pages = mem::replace(&mut section.pages, vec![]);   // :todo,
+            let pages = mem::replace(&mut section.pages, vec![]); //bm: mem::replace
             let (sorted_pages, cannot_be_sorted_pages) = sort_pages(pages, section.meta.sort_by());
             section.pages = populate_previous_and_next_pages(&sorted_pages);
             section.ignored_pages = cannot_be_sorted_pages;
